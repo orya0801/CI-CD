@@ -8,5 +8,5 @@ spec:
     spec:
       containers:
       - name: javaapp
-        image: orya0801/javaapp:1.0.0
+        image: orya0801/javaapp:${BUILD_NUMBER}
       restartPolicy: Never
