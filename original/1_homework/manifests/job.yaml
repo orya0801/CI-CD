@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: javaapp-job
 spec:
-  ttlSecondsAfterFinished: 3
+  ttlSecondsAfterFinished: 60
   template:
     spec:
       containers:
