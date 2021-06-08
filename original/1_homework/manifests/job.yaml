@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: javaapp-job
+spec:
+  ttlSecondsAfterFinished: 3
+  template:
+    spec:
+      containers:
+      - name: javaapp
+        image: orya0801/javaapp:1.0.0
+      restartPolicy: Never
