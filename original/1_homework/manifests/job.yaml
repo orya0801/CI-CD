@@ -3,10 +3,10 @@ kind: Job
 metadata:
   name: javaapp-job
 spec:
-  ttlSecondsAfterFinished: 60
+  ttlSecondsAfterFinished: 5
   template:
     spec:
       containers:
       - name: javaapp
-        image: orya0801/javaapp:${BUILD_NUMBER}
+        image: orya0801/javaapp:$BUILD_NUMBER
       restartPolicy: Never
