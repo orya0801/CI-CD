@@ -3,6 +3,10 @@ pipeline {
     label 'docker'
   }
 
+  tools {
+    dockerTool 'docker'
+  }
+
   options {
     buildDiscarder logRotator(numToKeepStr: '5')
     timestamps()
@@ -23,18 +27,14 @@ pipeline {
 
     stage('Build'){
 
-      agent {
-        label 'docker'
-      }
-
       steps {
         echo "Starting Build Stage!"
 
         withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
             sh '''
-              docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:latest ./original/2_homework/
-              docker push orya0801/javaapp:1.0.0
-              docker push orya0801/javaapp:latest
+            docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:latest ./original/2_homework/
+            docker push orya0801/javaapp:1.0.0
+            docker push orya0801/javaapp:latest
             '''
         }
 
