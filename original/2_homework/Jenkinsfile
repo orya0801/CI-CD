@@ -24,10 +24,7 @@ pipeline {
     stage('Build'){
 
       agent {
-        docker {
-          image 'alpine'
-          label 'docker'
-        }
+        label 'docker'
       }
 
       steps {
