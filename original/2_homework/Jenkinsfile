@@ -1,8 +1,8 @@
 pipeline {
   agent {
     label 'docker'
-    args '-v /var/run/docker.sock:/var/run/docker.sock'
   }
+
 
   options {
     buildDiscarder logRotator(numToKeepStr: '5')
@@ -23,6 +23,13 @@ pipeline {
     }
 
     stage('Build'){
+      
+      agent {
+        docker {
+          image: 'alpine:lts'
+          args: '-v /var/run/docker.sock:/var/run/docker.sock'
+        }
+      }
 
       steps {
         echo "Starting Build Stage!"
