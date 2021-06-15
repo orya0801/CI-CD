@@ -28,7 +28,8 @@ pipeline {
 
         withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
             sh '''
-              docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:1.0.0 ./original/2_homework/Dockerfile
+              find Dockerfile
+              docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:1.0.0 **/2_homework/Dockerfile
               docker push orya0801/javaapp:1.0.0
               docker push orya0801/javaapp:latest
             '''
