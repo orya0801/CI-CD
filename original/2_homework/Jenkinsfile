@@ -1,0 +1,49 @@
+pipeline {
+  agent {
+    label 'docker'
+  }
+
+  options {
+    buildDiscarder logRotator(numToKeepStr: '5')
+    timestamps()
+  }
+
+  parameters {
+    choice choices: ['orel', 'orel-test'], name: 'NAMESPACE'
+  }
+
+  stages {
+    stage('Test'){
+
+      steps {
+        echo "Starting Test Stage!"
+      }
+      
+    }
+
+    stage('Build'){
+
+      steps {
+        echo "Starting Build Stage!"
+
+        withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+            sh '''
+              docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:1.0.0 ./
+              docker push orya0801/javaapp:1.0.0
+              docker push orya0801/javaapp:latest
+            '''
+        }
+
+      }
+      
+    }
+
+    stage('Deploy'){
+
+      steps {
+        echo $NAMESPACE
+      }
+      
+    }
+  }
+}

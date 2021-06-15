@@ -1,0 +1,8 @@
+container:
+  image: orya0801/javaapp
+  tag: 1.0.0
+
+restart: Never
+
+ttlSecondsAfterFinished: 5
+

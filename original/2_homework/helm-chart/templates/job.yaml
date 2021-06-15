@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: javaapp-job
+spec:
+  ttlSecondsAfterFinished: {{ .Values.ttlSecondsAfterFinished }}
+  template:
+    spec:
+      containers:
+      - name: javaapp
+        image: {{ .Values.container.image }}:{{ .Values.container.tag }}
+      restartPolicy: {{ .Values.restart }}
