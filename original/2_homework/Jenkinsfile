@@ -23,6 +23,13 @@ pipeline {
 
     stage('Build'){
 
+      agent {
+        docker {
+          image 'alpine'
+          label 'docker'
+        }
+      }
+
       steps {
         echo "Starting Build Stage!"
 
