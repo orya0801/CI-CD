@@ -28,7 +28,7 @@ pipeline {
 
         withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
             sh '''
-              docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:1.0.0 /home/jenkins/workspace/Pipeline-Job-1/original/2_homework/Dockerfile
+              docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:latest ./
               docker push orya0801/javaapp:1.0.0
               docker push orya0801/javaapp:latest
             '''
