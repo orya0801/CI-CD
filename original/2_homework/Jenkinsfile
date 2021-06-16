@@ -75,16 +75,16 @@ pipeline {
       }
     }
     
-    stage('Install Helm') {
-      steps{
-        echo "INSTALLING HELM"
-        sh'''
-        git clone https://github.com/helm/helm.git
-        cd helm
-        make
-        '''
-      }
-    }
+    // stage('Install Helm') {
+    //   steps{
+    //     echo "INSTALLING HELM"
+    //     sh'''
+    //     git clone https://github.com/helm/helm.git
+    //     cd helm
+    //     make
+    //     '''
+    //   }
+    // }
 
     stage('Deploy'){
       input {
