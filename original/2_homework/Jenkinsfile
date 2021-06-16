@@ -16,8 +16,26 @@ pipeline {
   stages {
     stage('Test'){
 
+      agent {
+        docker {
+            image 'maven:3-alpine'
+        }
+      }
+
       steps {
         echo "Starting Test Stage!"
+        sh 'mvn test'
+      }
+
+      post {
+        always {
+          recordIssues(
+            enabledForFailure: true,
+            tools: [
+              junitParser(pattern: '**/*.xml')
+            ]
+          )
+        }
       }
       
     }
@@ -42,7 +60,9 @@ pipeline {
     stage('Deploy'){
 
       steps {
+        sh '''
         echo $NAMESPACE
+        '''
       }
       
     }
