@@ -36,8 +36,17 @@ pipeline {
     stage('Tests'){
       parallel {
         stage('Trivy Scan'){
+
+          agent {
+            docker {
+              image 'aquasec/trivy'
+              label 'docker'
+            }
+          }
+
           steps {
             echo "Starting Trivy Scan Stage!"
+            sh 'trivy image orya0801/javaapp:latest'
           }
         }  
 
@@ -71,11 +80,18 @@ pipeline {
     
 
     stage('Deploy'){
+      input {
+        message 'Do you want to deploy to production?'
+      }
 
       steps {
         sh '''
-        echo $NAMESPACE
+        echo DEPLOYING TO $NAMESPACE
         '''
+
+        withCredentials([kubeconfigFile(credentialsId:'kubeconfig', variable: 'KUBECONFIG')]) {
+          sh 'helm install -n $NAMESPACE./original/2_homework/helm-chart'
+        }
       }
       
     }
