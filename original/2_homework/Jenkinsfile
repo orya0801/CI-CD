@@ -92,6 +92,14 @@ pipeline {
       }
 
       steps {
+
+        agent {
+          docker {
+            image 'alpine/helm'
+            label 'docker'
+          }
+        }
+
         sh '''
         echo DEPLOYING TO $NAMESPACE
         '''
