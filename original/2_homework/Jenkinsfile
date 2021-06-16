@@ -91,14 +91,16 @@ pipeline {
         message 'Do you want to deploy to production?'
       }
 
+      agent {
+        docker {
+          image 'alpine/helm'
+          label 'docker'
+        }
+      }
+      
       steps {
 
-        agent {
-          docker {
-            image 'alpine/helm'
-            label 'docker'
-          }
-        }
+
 
         sh '''
         echo DEPLOYING TO $NAMESPACE
