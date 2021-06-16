@@ -37,16 +37,16 @@ pipeline {
       parallel {
         stage('Trivy Scan'){
 
-          agent {
-            docker {
-              image 'aquasec/trivy'
-              label 'docker'
-            }
-          }
+          // agent {
+          //   docker {
+          //     image 'aquasec/trivy'
+          //     label 'docker'
+          //   }
+          // }
 
           steps {
             echo "Starting Trivy Scan Stage!"
-            sh 'trivy image orya0801/javaapp:latest'
+            //sh 'trivy image orya0801/javaapp:latest'
           }
         }  
 
@@ -78,6 +78,16 @@ pipeline {
       }
     }
     
+    stage('Install Helm') {
+      steps{
+        echo "INSTALLING HELM"
+        sh'''
+        git clone https://github.com/helm/helm.git
+        cd helm
+        make
+        '''
+      }
+    }
 
     stage('Deploy'){
       input {
