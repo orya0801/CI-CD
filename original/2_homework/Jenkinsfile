@@ -14,32 +14,6 @@ pipeline {
   }
 
   stages {
-    stage('Test'){
-
-      agent {
-        docker {
-            image 'maven:3-alpine'
-            label 'docker'
-        }
-      }
-
-      steps {
-        echo "Starting Test Stage!"
-        sh 'mvn test'
-      }
-
-      post {
-        always {
-          recordIssues(
-            enabledForFailure: true,
-            tools: [
-              junitParser(pattern: './original/2_homework/*.xml')
-            ]
-          )
-        }
-      }
-      
-    }
 
     stage('Build'){
 
@@ -57,6 +31,44 @@ pipeline {
       }
       
     }
+
+
+    stage('Tests'){
+      parallel {
+        stage('Trivy Scan'){
+          steps {
+            echo "Starting Trivy Scan Stage!"
+          }
+        }  
+
+        stage('Test'){
+
+          // agent {
+          //   docker {
+          //     image 'maven:3-alpine'
+          //     label 'docker'
+          //   }
+          // }
+
+          steps {
+            echo "Starting Test Stage!"
+            // sh 'mvn test'
+          }
+
+          // post {
+          //   always {
+          //     recordIssues(
+          //       enabledForFailure: true,
+          //       tools: [
+          //         junitParser(pattern: '**/original/2_homework/*.xml')
+          //       ]
+          //     )
+          //   }
+          // }
+        }
+      }
+    }
+    
 
     stage('Deploy'){
 
