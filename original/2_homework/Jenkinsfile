@@ -33,7 +33,7 @@ pipeline {
           recordIssues(
             enabledForFailure: true,
             tools: [
-              junitParser(pattern: '**/*.xml')
+              junitParser(pattern: './original/2_homework/*.xml')
             ]
           )
         }
