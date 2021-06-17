@@ -74,32 +74,23 @@ pipeline {
         }
       }
     }
-    
-    stage('Install Helm') {
-      steps{
-        echo "INSTALLING HELM"
-        sh'''
-        apk add make
-        git clone https://github.com/helm/helm.git
-        cd helm
-        make
-        '''
-      }
-    }
 
     stage('Deploy'){
       input {
         message 'Do you want to deploy to production?'
       }
 
-      agent {
-        docker {
-          image 'alpine/helm'
-          label 'docker'
-        }
-      }
       
       steps {
+
+        echo "INSTALLING HELM"
+
+        sh '''
+        apk add make
+        git clone https://github.com/helm/helm.git
+        cd helm
+        make
+        '''
 
         sh '''
         echo DEPLOYING TO $NAMESPACE
