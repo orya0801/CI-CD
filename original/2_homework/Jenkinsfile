@@ -40,8 +40,8 @@ pipeline {
           steps {
             echo "Starting Trivy Scan Stage!"
             sh '''
-            wget https://github.com/knqyf263/trivy/releases/download/v0.0.13/trivy_0.0.13_Linux-64bit.tar.gz
-            tar zxvf trivy_0.0.13_Linux-64bit.tar.gz
+            #wget https://github.com/knqyf263/trivy/releases/download/v0.0.13/trivy_0.0.13_Linux-64bit.tar.gz
+            #tar zxvf trivy_0.0.13_Linux-64bit.tar.gz
             #./trivy --exit-code 0 --severity HIGH orya0801/javaapp:1.0.0
             '''
           }
