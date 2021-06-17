@@ -75,16 +75,17 @@ pipeline {
       }
     }
     
-    // stage('Install Helm') {
-    //   steps{
-    //     echo "INSTALLING HELM"
-    //     sh'''
-    //     git clone https://github.com/helm/helm.git
-    //     cd helm
-    //     make
-    //     '''
-    //   }
-    // }
+    stage('Install Helm') {
+      steps{
+        echo "INSTALLING HELM"
+        sh'''
+        apk add make
+        git clone https://github.com/helm/helm.git
+        cd helm
+        make
+        '''
+      }
+    }
 
     stage('Deploy'){
       input {
@@ -99,8 +100,6 @@ pipeline {
       }
       
       steps {
-
-
 
         sh '''
         echo DEPLOYING TO $NAMESPACE
