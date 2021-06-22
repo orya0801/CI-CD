@@ -44,9 +44,7 @@ pipeline {
                     }
 
                     steps {
-                        sh 'cd $DEFAULT_DIR'
-                        sh 'mvn test'
-                        sh 'find surfire-reports'
+                        sh 'mvn test -f $DEFAULT_DIR/pom.xml'
                     }
 
                     post {
@@ -68,8 +66,7 @@ pipeline {
                         }
                     }
                     steps {
-                        sh 'trivy --cache-dir .trivycache/ -f json -o trivy.json $IMAGE_REPO:$TAG'
-                        sh 'find trivy.json'
+                        sh 'trivy --cache-dir .trivycache/ -f json -o $DEFAULT_DIR/trivy.json $IMAGE_REPO:$TAG'
                     }
                     post {
                         always {
