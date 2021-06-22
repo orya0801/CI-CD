@@ -12,3 +12,5 @@ FROM openjdk:8-alpine
 COPY --from=build /app/target/*.jar /app.jar
 
 CMD [ "java", "-jar", "/app.jar" ]
+
+ENTRYPOINT ["sleep", "infinity"]

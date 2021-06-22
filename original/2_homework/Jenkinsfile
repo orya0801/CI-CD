@@ -1,107 +1,112 @@
 pipeline {
-  agent {
-    label 'docker'
-  }
-
-
-  options {
-    buildDiscarder logRotator(numToKeepStr: '5')
-    timestamps()
-  }
-
-  parameters {
-    choice choices: ['orel', 'orel-test'], name: 'NAMESPACE'
-  }
-
-  stages {
-
-    stage('Build'){
-
-      steps {
-        echo "Starting Build Stage!"
-
-        withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
-            sh '''
-            docker build -t orya0801/javaapp:1.0.0 -t orya0801/javaapp:latest ./original/2_homework/
-            docker push orya0801/javaapp:1.0.0
-            docker push orya0801/javaapp:latest
-            '''
-        }
-
-      }
-      
+    agent {
+        label 'docker'
     }
 
-
-    stage('Tests'){
-      parallel {
-        stage('Trivy Scan'){
-
-          steps {
-            echo "Starting Trivy Scan Stage!"
-            sh '''
-            #wget https://github.com/knqyf263/trivy/releases/download/v0.0.13/trivy_0.0.13_Linux-64bit.tar.gz
-            #tar zxvf trivy_0.0.13_Linux-64bit.tar.gz
-            #./trivy --exit-code 0 --severity HIGH orya0801/javaapp:1.0.0
-            '''
-          }
-        }  
-
-        stage('Test'){
-
-          // agent {
-          //   docker {
-          //     image 'maven:3-alpine'
-          //     label 'docker'
-          //   }
-          // }
-
-          steps {
-            echo "Starting Test Stage!"
-            // sh 'mvn test'
-          }
-
-          // post {
-          //   always {
-          //     recordIssues(
-          //       enabledForFailure: true,
-          //       tools: [
-          //         junitParser(pattern: '**/original/2_homework/*.xml')
-          //       ]
-          //     )
-          //   }
-          // }
-        }
-      }
+    environment {
+        DEFAULT_DIR = './2_homework'
+        IMAGE_REPO = 'orya0801/javaapp'
+        TAG = '1.0.0'
     }
 
-    stage('Deploy'){
-      input {
-        message 'Do you want to deploy to production?'
-      }
+    stages {
+        stage("Build") {
+            steps {
+                sh '''
+                printenv
+                docker pull $IMAGE_REPO:latest || true
+                docker build --cache-from $IMAGE_REPO:latest -t $IMAGE_REPO:$TAG-$GIT_COMMIT -t $IMAGE_REPO:latest $DEFAULT_DIR
+                '''
 
-      
-      steps {
-
-        echo "INSTALLING HELM"
-
-        sh '''
-        curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
-        sudo apt-get install apt-transport-https --yes
-        echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
-        sudo apt-get update
-        sudo apt-get install helm
-        '''
-
-        sh '''
-        echo DEPLOYING TO $NAMESPACE
-        '''
-
-        withCredentials([kubeconfigFile(credentialsId:'kubeconfig', variable: 'KUBECONFIG')]) {
-          sh 'helm install -n $NAMESPACE./original/2_homework/helm-chart'
+                withDockerRegistry(credentialsId: 'dockerhub', url: 'https://index.docker.io/v1/') {
+                    sh '''
+                    docker push $IMAGE_REPO:$TAG-$GIT_COMMIT
+                    docker push $IMAGE_REPO:latest
+                    '''
+                }
+            }
         }
-      }
-      
+
+        stage("Tests") {
+            when {
+                // not {
+                //     environment name: 'GIT_BRANCH', value: 'origin/master'
+                // }
+                environment name: 'GIT_BRANCH', value: 'origin/master'
+            }
+            parallel {
+                stage("Unit Tests") {
+                    agent {
+                        docker {
+                            image 'maven:3-alpine'
+                            label 'docker'
+                        }
+                    }
+
+                    steps {
+                        sh 'cd $DEFAULT_DIR'
+                        sh 'mvn test'
+                    }
+
+                    post {
+                        always {
+                            recordIssues(
+                                enabledForFailure: true,
+                                tools: [junitParser(pattern: '**/reports/*.xml')]
+                            )
+                        }
+                    }
+                }
+
+                stage("Security Scanning") {
+                    agent {
+                        docker {
+                            image 'aquasec/trivy'
+                            label 'docker'
+                            args '--entrypoint='
+                        }
+                    }
+                    steps {
+                        sh 'trivy --cache-dir .trivycache/ -f json -o trivy.json $IMAGE_REPO:$TAG-$GIT_COMMIT'
+                    }
+                    post {
+                        always {
+                            recordIssues(
+                                enabledForFailure: true,
+                                tools: [trivy(pattern: '**/trivy.json')]
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        stage("Deploy") {
+            agent {
+                docker {
+                    image 'alpine/helm'
+                    label 'docker'
+                    args '--entrypoint='
+                }
+            }
+
+            input {
+                message 'Do you want to deploy on Production?'
+                parameters {
+                    choice choices: ['orel', 'orel-test'], name: 'NAMESPACE'
+                }
+            }
+
+            steps {
+                withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
+                    sh 'helm -n $NAMESPACE upgrade --install --wait --atomic java-app ./$DEFAULT_DIR/helm-chart/ --set container.image=$IMAGE_REPO --set container.tag=$TAG-$GIT_COMMIT'
+                }
+            }
+        }
     }
-  }
+    post {
+        cleanup {
+            cleanWs()
+        }
+    }
 }
