@@ -4,7 +4,7 @@ pipeline {
     }
 
     environment {
-        DEFAULT_DIR = './2_homework'
+        DEFAULT_DIR = './original/2_homework'
         IMAGE_REPO = 'orya0801/javaapp'
         TAG = '1.0.0'
     }
