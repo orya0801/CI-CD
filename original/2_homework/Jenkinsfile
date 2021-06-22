@@ -46,6 +46,7 @@ pipeline {
                     steps {
                         sh 'cd $DEFAULT_DIR'
                         sh 'mvn test'
+                        sh 'find surfire-reports'
                     }
 
                     post {
@@ -68,6 +69,7 @@ pipeline {
                     }
                     steps {
                         sh 'trivy --cache-dir .trivycache/ -f json -o trivy.json $IMAGE_REPO:$TAG-$GIT_COMMIT'
+                        sh 'find trivy.json'
                     }
                     post {
                         always {
