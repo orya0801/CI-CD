@@ -52,7 +52,7 @@ pipeline {
                         always {
                             recordIssues(
                                 enabledForFailure: true,
-                                tools: [junitParser(pattern: '$DEFAULT_DIR/target/surefire-reports/*.xml')]
+                                tools: [junitParser(pattern: '**/surefire-reports/*.xml')]
                             )
                         }
                     }
@@ -73,7 +73,7 @@ pipeline {
                         always {
                             recordIssues(
                                 enabledForFailure: true,
-                                tools: [trivy(pattern: '$DEFAULT_DIR/trivy.json')]
+                                tools: [trivy(pattern: '**/trivy.json')]
                             )
                         }
                     }
