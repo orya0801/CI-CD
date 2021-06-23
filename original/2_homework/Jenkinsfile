@@ -7,6 +7,7 @@ pipeline {
         DEFAULT_DIR = './original/2_homework'
         IMAGE_REPO = 'orya0801/javaapp'
         TAG = '1.0.0'
+        APP_NAME = 'javaapp'
     }
 
     stages {
@@ -29,10 +30,10 @@ pipeline {
 
         stage("Tests") {
             when {
-                not {
-                    environment name: 'GIT_BRANCH', value: 'origin/master'
-                }
-                // environment name: 'GIT_BRANCH', value: 'origin/master'
+                // not {
+                //     environment name: 'GIT_BRANCH', value: 'origin/master'
+                // }
+                environment name: 'GIT_BRANCH', value: 'origin/master'
             }
             parallel {
                 stage("Unit Tests") {
@@ -51,7 +52,7 @@ pipeline {
                         always {
                             recordIssues(
                                 enabledForFailure: true,
-                                tools: [junitParser(pattern: '**/surfire-reports/*.xml')]
+                                tools: [junitParser(pattern: '$DEFAULT_DIR/target/surfire-reports/*.xml')]
                             )
                         }
                     }
@@ -72,7 +73,7 @@ pipeline {
                         always {
                             recordIssues(
                                 enabledForFailure: true,
-                                tools: [trivy(pattern: '**/trivy.json')]
+                                tools: [trivy(pattern: '$DEFAULT_DIR/trivy.json')]
                             )
                         }
                     }
@@ -98,7 +99,7 @@ pipeline {
 
             steps {
                 withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
-                    sh 'helm -n $NAMESPACE upgrade --install --wait --atomic java-app ./$DEFAULT_DIR/helm-chart/ --set container.image=$IMAGE_REPO --set container.tag=$TAG'
+                    sh 'helm -n $NAMESPACE upgrade --install --wait --atomic $APP_NAME ./$DEFAULT_DIR/helm-chart/ --set container.image=$IMAGE_REPO --set container.tag=$TAG'
                 }
             }
         }
