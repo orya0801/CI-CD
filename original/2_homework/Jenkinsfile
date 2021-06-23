@@ -97,7 +97,7 @@ pipeline {
             }
 
             steps {
-                withCredentials([kubeconfigContent(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_CONTENT')]) {
+                withCredentials([kubeconfigFile(credentialsId: 'kubeconfig', variable: 'KUBECONFIG')]) {
                     sh 'helm -n $NAMESPACE upgrade --install --wait --atomic java-app ./$DEFAULT_DIR/helm-chart/ --set container.image=$IMAGE_REPO --set container.tag=$TAG'
                 }
             }
