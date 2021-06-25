@@ -89,6 +89,10 @@ pipeline {
                 }
             }
 
+            when {
+                environment name: 'GIT_BRANCH', value: 'origin/master'
+            }
+
             input {
                 message 'Do you want to deploy on Production?'
                 parameters {
